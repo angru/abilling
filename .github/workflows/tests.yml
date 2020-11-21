@@ -5,7 +5,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build image
-        run: docker-compose build adilling-test
       - name: Run tests
-        run: docker-compose run --entrypoint "python -m pytest -vvs" abilling-test
+        run: |
+          docker-compose build abilling-test
+          docker-compose run --name "abilling-test" --entrypoint "python -m pytest -vvs --cov=./abilling --cov-report=xml" abilling-test
+          docker cp abilling-test:/app/coverage.xml ./
+      - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v1
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            file: ./coverage.xml
+            flags: unittests
+            env_vars: OS,PYTHON
+            name: abilling-codecov
+            fail_ci_if_error: true
