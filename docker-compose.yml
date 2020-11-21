@@ -28,3 +28,12 @@ services:
     depends_on:
       - postgres
     container_name: abilling
+  abilling-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ENV_FILE: config/testing.env
+      DB_PG_HOST: postgres
+    depends_on:
+      - postgres
