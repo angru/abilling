@@ -22,7 +22,14 @@ async def client():
 async def test_docs(client: TestClient):
     response: Response = await client.get('/docs')
 
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
+
+
+async def test_wrong_url(client: TestClient):
+    response: Response = await client.get('/iron-man')
+
+    assert response.status_code == 404, response.text
+    assert response.json() == {'error': 'NOT_FOUND'}
 
 
 class TestApi(TestWithDb):

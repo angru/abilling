@@ -1,4 +1,4 @@
-from decimal import Decimal
+import typing as t
 
 from pydantic import BaseModel
 
@@ -26,3 +26,9 @@ class TransferInfo(BaseModel):
     wallet_from: int
     wallet_to: int
     amount: str
+
+
+class ErrorInfo(BaseModel):
+    error: str
+    message: str = None
+    detail: t.Any = None
