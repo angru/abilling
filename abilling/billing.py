@@ -25,7 +25,7 @@ class Billing(Executor):
         )
 
         if not result:
-            raise errors.NotFound(f'Client with id: {client_id} not found')
+            raise errors.NotFound(message=f'Client with id: {client_id} not found')
 
         return {
             'id': result[0],
