@@ -47,7 +47,7 @@ class Executor:
         if self.in_transaction:
             self.transaction = self.connection.transaction()
 
-        await self.transaction.start()
+            await self.transaction.start()
 
         return self
 

@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.sql import func
 
 from abilling.app.config import config
-from abilling.constants import OperationType
+from abilling.utils.constants import OperationType
 
 metadata = sa.MetaData(schema=config.DB_PG_SCHEMA)
 

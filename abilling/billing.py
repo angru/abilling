@@ -4,11 +4,38 @@ from decimal import Decimal
 import sqlalchemy as sa
 
 from abilling import models
+from abilling.utils import errors
 from abilling.app.db import Executor
-from abilling.constants import OperationType
+from abilling.utils.constants import OperationType
 
 
 class Billing(Executor):
+    async def get_client(self, client_id: int) -> dict:
+        result = await self.connection.fetchrow(
+            sa.select([
+                models.client.c.id,
+                models.client.c.name,
+                models.wallet.c.id,
+                models.wallet.c.balance,
+            ]).select_from(
+                models.client.join(models.wallet),
+            ).where(
+                models.client.c.id == client_id,
+            )
+        )
+
+        if not result:
+            raise errors.NotFound(f'Client with id: {client_id} not found')
+
+        return {
+            'id': result[0],
+            'name': result[1],
+            'wallet': {
+                'id': result[2],
+                'balance': result[3],
+            }
+        }
+
     async def create_client(self, name) -> dict:
         result = await self.connection.fetchrow(
             models.client.insert(return_defaults=True).values({'name': name}),

@@ -6,9 +6,9 @@ from alembic.config import Config as AlembicConfig
 from abilling import models
 from abilling.app.config import config as app_config
 from abilling.app.db import Db
-from abilling.models import metadata
 
 ALEMBIC_CONFIG = 'alembic.ini'
+
 
 
 class TestWithDb:
@@ -24,6 +24,13 @@ class TestWithDb:
 
     @pytest.fixture(autouse=True, scope='session')
     def db_session(self):
+        if app_config.ENVIRONMENT != 'testing':
+            raise ValueError(
+                'Are you insane? Running tests on environments different from "testing" '
+                'is strongly not recommended. '
+                f'Environment: {app_config.ENVIRONMENT}'
+            )
+
         config = AlembicConfig(ALEMBIC_CONFIG)
         config.attributes['configure_logger'] = False
 

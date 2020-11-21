@@ -9,6 +9,8 @@ python = "^3.8"
 asyncpg = "^0.21.0"
 asyncpgsa = "^0.26.3"
 pydantic = {extras = ["dotenv"], version = "^1.7.2"}
+fastapi = "^0.61.2"
+uvicorn = "^0.12.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.2"

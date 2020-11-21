@@ -36,4 +36,5 @@ class TestBilling(TestWithDb):
         client1 = await controllers.create_client(name='Bill', db=db)
         client2 = await controllers.create_client(name='John', db=db)
 
-        await controllers.make_transfer(client1['id'], client2['id'], 20, db)
+        await controllers.charge_wallet(client1['id'], Decimal(10), db)
+        await controllers.make_transfer(client1['id'], client2['id'], Decimal(10), db)
