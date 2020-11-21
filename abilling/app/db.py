@@ -1,3 +1,4 @@
+import contextlib
 import typing as t
 
 import asyncpgsa
@@ -28,34 +29,19 @@ class Db:
             await self.pool.close()
 
     def executor(self, executor: t.Type[ExecutorType], transaction=False) -> ExecutorType:
-        return executor(
-            self.pool,
-            in_transaction=transaction,
-        )
+        return execute(self.pool, executor, transaction)
+
+
+@contextlib.asynccontextmanager
+async def execute(pool, executor: t.Type[ExecutorType], transaction=False) -> ExecutorType:
+    conn = pool.transaction() if transaction else pool.acquire()
+
+    async with conn as connection:
+        yield executor(connection)
 
 
 class Executor:
     connection = None
 
-    def __init__(self, pool, in_transaction=False):
-        self.pool = pool
-        self.in_transaction = in_transaction
-
-    async def __aenter__(self):
-        self.connection = await self.pool._acquire(timeout=None)
-
-        if self.in_transaction:
-            self.transaction = self.connection.transaction()
-
-            await self.transaction.start()
-
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.in_transaction:
-            if exc_type:
-                await self.transaction.rollback()
-            else:
-                await self.transaction.commit()
-
-        await self.pool.release(self.connection)
+    def __init__(self, connection):
+        self.connection = connection

@@ -10,7 +10,6 @@ from abilling.app.db import Db
 ALEMBIC_CONFIG = 'alembic.ini'
 
 
-
 class TestWithDb:
     @pytest.fixture(autouse=True)
     async def db(self):
