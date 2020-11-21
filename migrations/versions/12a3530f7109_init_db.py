@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-from abilling.config import config
+from abilling.app.config import config
 
 revision = '12a3530f7109'
 down_revision = None

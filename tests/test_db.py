@@ -1,42 +1,21 @@
-import asyncio
 from decimal import Decimal
 
 import pytest
 
-from abilling import controllers
-from abilling.config import config
-from abilling.db import Storage
+from abilling.api import controllers
+from abilling.app.config import config
+from abilling.app.db import Db
+from abilling.billing import Billing
+from tests.utils import EqMock
 
 pytestmark = pytest.mark.asyncio
 
-class EqMock:
-    value = ...
-
-    def __init__(self, store_value=False):
-        self.store_value = store_value
-
-    def __repr__(self):
-        if self.value:
-            return 'Not compared yet'
-
-        return str(self.value)
-
-    def __eq__(self, other):
-        if self.store_value:
-            if self.value is ...:
-                self.value = other
-        else:
-            self.value = other
-
-        return self.value == other
-
 
 async def test_create_client():
-    storage = Storage(config.DB_PG_URL)
+    db = Db(config.DB_PG_URL)
+    await db.init()
 
-    await storage.init()
-
-    client = await controllers.create_client(name='Bill', storage=storage)
+    client = await controllers.create_client(name='Bill', db=db)
 
     client_id = EqMock(store_value=True)
 
@@ -50,3 +29,19 @@ async def test_create_client():
             'balance': Decimal(0),
         },
     }
+
+    await db.stop()
+
+
+async def test_charge():
+    db = Db(config.DB_PG_URL)
+    await db.init()
+    await controllers.charge_wallet(1, Decimal(10), db)
+    await db.stop()
+
+
+async def test_transfer():
+    db = Db(config.DB_PG_URL)
+    await db.init()
+    await controllers.make_transfer(1, 2, 20, db)
+    await db.stop()

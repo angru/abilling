@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 from alembic import context
 
-from abilling.config import config as app_config
+from abilling.app.config import config as app_config
 from abilling.models import metadata
 
 # this is the Alembic Config object, which provides

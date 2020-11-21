@@ -1,17 +1,10 @@
-import enum
-
 import sqlalchemy as sa
 from sqlalchemy.sql import func
 
-from abilling.config import config
+from abilling.app.config import config
+from abilling.constants import OperationType
 
 metadata = sa.MetaData(schema=config.DB_PG_SCHEMA)
-
-
-class OperationType(str, enum.Enum):
-    ACCRUAL = 'ACCRUAL'
-    WRITE_OFF = 'WRITE_OFF'
-
 
 client = sa.Table(
     'client',
