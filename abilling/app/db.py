@@ -43,7 +43,9 @@ class Executor:
 
     async def __aenter__(self):
         self.connection = await self.pool._acquire(timeout=None)
-        self.transaction = self.connection.transaction()
+
+        if self.in_transaction:
+            self.transaction = self.connection.transaction()
 
         await self.transaction.start()
 

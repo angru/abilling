@@ -4,6 +4,7 @@ from pydantic import BaseSettings
 
 
 class Config(BaseSettings):
+    ENVIRONMENT: str
     DB_PG_NAME: str = 'postgres'
     DB_PG_SCHEMA: str = 'public'
     DB_PG_USERNAME: str
