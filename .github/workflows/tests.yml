@@ -6,4 +6,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Test
-        run: docker-compose run --entrypoint "python -m pytest -vvs" abilling-tests
+        run: docker-compose run --entrypoint "python -m pytest -vvs" abilling-test
