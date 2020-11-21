@@ -14,7 +14,7 @@ class TestBilling(TestWithDb):
     async def test_create_client(self, db: Db):
         client = await controllers.create_client(name='Bill', db=db)
 
-        client_id = EqMock(store_value=True)
+        client_id = EqMock(store_value=True, type=int)
 
         assert client == {
             'id': client_id,
