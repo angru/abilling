@@ -25,7 +25,9 @@ ENV PYTHONUNBUFFERED=1 \
     # paths
     # this is where our requirements + virtual environment will live
     PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
+    VENV_PATH="/opt/pysetup/.venv" \
+    # this prevents error during multidict build
+    MULTIDICT_NO_EXTENSIONS=1
 
 
 # prepend poetry and venv to path

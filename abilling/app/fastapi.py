@@ -9,6 +9,13 @@ from abilling.app.db import Db
 from abilling.utils import errors
 
 
+STATUS_CODE_BY_ERROR = {
+    errors.NotFound: 404,
+    errors.NotEnoughMoney: 400,
+    errors.BaseError: 500,
+}
+
+
 def create_app() -> FastAPI:
     app = FastAPI()
     db = Db(config.DB_PG_URL)
@@ -23,9 +30,9 @@ def create_app() -> FastAPI:
     async def shutdown():
         await db.stop()
 
-    @app.exception_handler(errors.NotFound)
+    @app.exception_handler(errors.BaseError)
     async def http_exception_handler(request, exc: errors.NotFound):
-        return JSONResponse(exc.dict(), status_code=404)
+        return JSONResponse(exc.dict(), status_code=STATUS_CODE_BY_ERROR[type(exc)])
 
     @app.exception_handler(404)
     async def http_exception_handler(request, exc):

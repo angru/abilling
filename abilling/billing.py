@@ -87,6 +87,6 @@ class Billing(Executor):
         )
 
         if balance < amount:
-            raise ValueError('Not enough money')
+            raise errors.NotEnoughMoney(message='Not enough money to perform transfer')
 
         await self.charge_wallet(wallet_id, -amount)  # FIXME: use own query

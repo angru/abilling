@@ -4,7 +4,7 @@ import pytest
 
 from abilling.api import controllers
 from abilling.app.db import Db
-from tests.db_fixtures import TestWithDb
+from tests.conftest import TestWithDb
 from tests.utils import EqMock
 
 pytestmark = pytest.mark.asyncio

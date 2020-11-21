@@ -26,3 +26,7 @@ class BaseError(Exception):
 
 class NotFound(BaseError):
     error: str = 'OBJECT_NOT_FOUND'
+
+
+class NotEnoughMoney(BaseError):
+    error: str = 'NOT_ENOUGH_MONEY'

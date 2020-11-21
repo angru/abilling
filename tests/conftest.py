@@ -10,17 +10,18 @@ from abilling.app.db import Db
 ALEMBIC_CONFIG = 'alembic.ini'
 
 
+@pytest.fixture
+async def db():
+    db = Db(app_config.DB_PG_URL)
+
+    await db.init()
+
+    yield db
+
+    await db.stop()
+
+
 class TestWithDb:
-    @pytest.fixture(autouse=True)
-    async def db(self):
-        db = Db(app_config.DB_PG_URL)
-
-        await db.init()
-
-        yield db
-
-        await db.stop()
-
     @pytest.fixture(autouse=True, scope='session')
     def db_session(self):
         if app_config.ENVIRONMENT != 'testing':
