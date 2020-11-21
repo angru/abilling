@@ -12,3 +12,19 @@ services:
       - ./scripts/sql:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
+  abilling:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      DB_PG_USERNAME: user
+      DB_PG_PASSWORD: some-pwd
+      DB_PG_HOST: postgres
+      DB_PG_SCHEMA: abilling
+      ENVIRONMENT: local
+      PYTHONPATH: .
+    depends_on:
+      - postgres
+    container_name: abilling
