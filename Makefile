@@ -13,4 +13,4 @@ test:
 	docker-compose run --entrypoint "python -m pytest -vvs" abilling-test
 
 run:
-	docker-compose up abilling
+	docker-compose up --build abilling

@@ -9,8 +9,11 @@ make test
 
 ## Run service
 ```shell script
+# will serve on http://localhost:5000
 make run
 ```
+
+## Documentation
 
 documentation available on [local machine](http://localhost:5000/docs)
 
