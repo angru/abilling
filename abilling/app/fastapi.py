@@ -15,20 +15,7 @@ STATUS_CODE_BY_ERROR = {
 }
 
 
-def create_app() -> FastAPI:
-    app = FastAPI()
-    db = Db(config.DB_PG_URL)
-
-    app.extra['db'] = db
-
-    @app.on_event("startup")
-    async def startup():
-        await db.init()
-
-    @app.on_event("shutdown")
-    async def shutdown():
-        await db.stop()
-
+def apply_error_handlers(app: FastAPI):
     @app.exception_handler(errors.BaseError)
     async def handle_app_error(request, exc: errors.NotFound):
         return JSONResponse(exc.dict(), status_code=STATUS_CODE_BY_ERROR[type(exc)])
@@ -46,6 +33,23 @@ def create_app() -> FastAPI:
             },
             status_code=422,
         )
+
+
+def create_app() -> FastAPI:
+    app = FastAPI()
+    db = Db(config.DB_PG_URL)
+
+    app.extra['db'] = db
+
+    @app.on_event("startup")
+    async def startup():
+        await db.init()
+
+    @app.on_event("shutdown")
+    async def shutdown():
+        await db.stop()
+
+    apply_error_handlers(app)
 
     app.include_router(views.billing_router)
 

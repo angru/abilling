@@ -1,4 +1,5 @@
 import typing as t
+from decimal import Decimal
 
 import sqlalchemy as sa
 import asyncpg.exceptions
@@ -6,7 +7,7 @@ import asyncpg.exceptions
 from abilling import models
 from abilling.utils import errors
 from abilling.app.db import Executor
-from abilling.utils.constants import OperationType
+from abilling.utils.constants import OperationType, Currency
 
 
 class Billing(Executor):
@@ -49,10 +50,18 @@ class Billing(Executor):
             'date': result['date'],
         }
 
-    async def create_wallet(self, client_id) -> dict:
+    async def create_wallet(self, client_id, currency: str = Currency.USD) -> dict:
+        currency_id = await self.connection.fetchval(
+            sa.select([models.currency.c.id]).where(
+                models.currency.c.code == currency,
+            ),
+        )
+
         try:
             result = await self.connection.fetchrow(
-                sa.insert(models.wallet, return_defaults=True).values(client_id=client_id),
+                sa.insert(
+                    models.wallet, return_defaults=True,
+                ).values(client_id=client_id, currency_id=currency_id),
             )
         except asyncpg.exceptions.ForeignKeyViolationError:
             raise errors.NotFound(f'Client with id: {client_id} not found')
@@ -74,13 +83,16 @@ class Billing(Executor):
         if not result:
             raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
 
-    async def save_history(self, wallet_id: int, amount, operation_type: OperationType) -> t.NoReturn:
+    async def save_transaction(
+        self, wallet_id: int, amount: Decimal, operation_type: OperationType, description=None,
+    ) -> t.NoReturn:
         try:
             await self.connection.fetchval(
-                sa.insert(models.operation_history).values(
+                sa.insert(models.transaction).values(
                     wallet_id=wallet_id,
                     amount=amount,
                     type=operation_type,
+                    description=description,
                 ),
             )
         except asyncpg.exceptions.ForeignKeyViolationError:
@@ -94,7 +106,7 @@ class Billing(Executor):
         )
 
         if balance is None:
-            raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
+            raise errors.NotFound(message=f'Wallet with id: {wallet_id} not found')
 
         if balance < amount:
             raise errors.NotEnoughMoney(message='Not enough money to perform transfer')

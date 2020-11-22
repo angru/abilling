@@ -47,6 +47,6 @@ class TestWithDb:
         engine = sa.create_engine(app_config.DB_PG_URL)
 
         with engine.connect() as conn:
-            conn.execute(models.operation_history.delete())
+            conn.execute(models.transaction.delete())
             conn.execute(models.wallet.delete())
             conn.execute(models.client.delete())

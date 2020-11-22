@@ -16,7 +16,7 @@ class TestBilling(TestWithDb):
     async def test_operations_history_wallet_not_found(self, db: Db):
         async with db.connection() as connection:
             with pytest.raises(errors.NotFound):
-                await Billing(connection).save_history(999999, Decimal('1'), OperationType.ACCRUAL)
+                await Billing(connection).save_transaction(999999, Decimal('1'), OperationType.ACCRUAL)
 
     async def test_withdraw_wallet_not_found(self, db: Db):
         async with db.connection() as connection:

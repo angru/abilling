@@ -9,6 +9,7 @@ env:  # is not working right now
 	pre-commit install
 
 test:
+	docker-compose build abilling-test
 	docker-compose run --entrypoint "python -m pytest -vvs" abilling-test
 
 run:

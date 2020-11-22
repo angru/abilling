@@ -14,6 +14,16 @@ client = sa.Table(
     sa.Column('name', sa.String(255), nullable=False),
 )
 
+
+currency = sa.Table(
+    'currency',
+    metadata,
+    sa.Column('id', sa.BigInteger, primary_key=True, autoincrement=True),
+    sa.Column('code', sa.String(255), nullable=False),
+    sa.UniqueConstraint('code', name='uc_currency_name'),
+    sa.Index('ix_currency_code', 'code', unique=True),
+)
+
 wallet = sa.Table(
     'wallet',
     metadata,
@@ -23,18 +33,24 @@ wallet = sa.Table(
         sa.ForeignKey('client.id', name='fk_wallet_client_id'),
         nullable=False,
     ),
+    sa.Column(
+        'currency_id',
+        sa.ForeignKey('currency.id', name='fk_wallet_currency_id'),
+        nullable=False,
+    ),
     sa.Column('balance', sa.DECIMAL, nullable=False, server_default=sa.text('0')),
     sa.Index('ix_wallet_client_id', 'client_id'),
+    sa.CheckConstraint('balance >= 0', name='check_balance_cant_be_negative'),
 )
 
-operation_history = sa.Table(
-    'operation_history',
+transaction = sa.Table(
+    'transaction',
     metadata,
     sa.Column('id', sa.BigInteger, primary_key=True, autoincrement=True),
     sa.Column('date', sa.DateTime(timezone=True), nullable=False, server_default=func.now()),
     sa.Column(
         'wallet_id',
-        sa.ForeignKey('wallet.id', name='fk_operation_history_wallet_id'),
+        sa.ForeignKey('wallet.id', name='fk_transaction_wallet_id'),
         nullable=False,
     ),
     sa.Column(
@@ -43,6 +59,6 @@ operation_history = sa.Table(
         nullable=False,
     ),
     sa.Column('amount', sa.DECIMAL, nullable=False),
-    sa.Column('description', sa.String(10000)),
-    sa.Index('ix_operation_history_wallet_id', 'wallet_id'),
+    sa.Column('description', sa.JSON),
+    sa.Index('ix_transaction_wallet_id', 'wallet_id'),
 )

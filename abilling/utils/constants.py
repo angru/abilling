@@ -12,3 +12,7 @@ class ErrorType(str, enum.Enum):
     NOT_FOUND = 'NOT_FOUND'
     OBJECT_NOT_FOUND = 'OBJECT_NOT_FOUND'
     NOT_ENOUGH_MONEY = 'NOT_ENOUGH_MONEY'
+
+
+class Currency(str):
+    USD = 'USD'
