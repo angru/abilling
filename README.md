@@ -24,3 +24,4 @@ documentation available on [local machine](http://localhost:5000/docs)
 * Full body responses rather then 204 status codes
 * More detailed data about client
 * Operation type in separate table not enum
+* Add description to validators fields
