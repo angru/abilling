@@ -22,7 +22,7 @@ class Billing(Executor):
                 models.client.join(models.wallet),
             ).where(
                 models.client.c.id == client_id,
-            )
+            ),
         )
 
         if not result:
@@ -35,7 +35,7 @@ class Billing(Executor):
             'wallet': {
                 'id': result[3],
                 'balance': result[4],
-            }
+            },
         }
 
     async def create_client(self, name) -> dict:
@@ -65,10 +65,10 @@ class Billing(Executor):
     async def charge_wallet(self, wallet_id, amount) -> t.NoReturn:
         result = await self.connection.fetchval(
             sa.update(models.wallet).where(
-                models.wallet.c.id == wallet_id
+                models.wallet.c.id == wallet_id,
             ).values(
                 balance=models.wallet.c.balance + amount,
-            ).returning(models.wallet.c.id)
+            ).returning(models.wallet.c.id),
         )
 
         if not result:
@@ -81,7 +81,7 @@ class Billing(Executor):
                     wallet_id=wallet_id,
                     amount=amount,
                     type=operation_type,
-                )
+                ),
             )
         except asyncpg.exceptions.ForeignKeyViolationError:
             raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
@@ -90,7 +90,7 @@ class Billing(Executor):
         balance = await self.connection.fetchval(
             sa.select([models.wallet.c.balance]).with_for_update().where(
                 models.wallet.c.id == wallet_id,
-            )
+            ),
         )
 
         if balance is None:
@@ -101,6 +101,6 @@ class Billing(Executor):
 
         await self.connection.fetchval(
             sa.update(models.wallet).where(
-                models.wallet.c.id == wallet_id
-            ).values(balance=models.wallet.c.balance - amount)
+                models.wallet.c.id == wallet_id,
+            ).values(balance=models.wallet.c.balance - amount),
         )

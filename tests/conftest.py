@@ -28,7 +28,7 @@ class TestWithDb:
             raise ValueError(
                 'Are you insane? Running tests on environments different from "testing" '
                 'is strongly not recommended. '
-                f'Environment: {app_config.ENVIRONMENT}'
+                f'Environment: {app_config.ENVIRONMENT}',
             )
 
         config = AlembicConfig(ALEMBIC_CONFIG)

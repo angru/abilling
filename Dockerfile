@@ -74,4 +74,3 @@ RUN ls -l scripts
 
 EXPOSE 5000
 ENTRYPOINT ["./scripts/entrypoint.sh"]
-

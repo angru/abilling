@@ -65,4 +65,3 @@ class TestControllers(TestWithDb):
 
         assert found_client == new_client
         assert found_client is not new_client
-

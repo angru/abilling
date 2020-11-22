@@ -45,4 +45,3 @@ async def transfer(operation_info: TransferInfo, db_manager: Db = Depends(db)):
     await controllers.make_transfer(**operation_info.dict(), db=db_manager)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-

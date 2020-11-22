@@ -44,7 +44,7 @@ def create_app() -> FastAPI:
                 'error': ErrorType.VALIDATION_ERROR,
                 'detail': exc.errors(),
             },
-            status_code=422
+            status_code=422,
         )
 
     app.include_router(views.billing_router)

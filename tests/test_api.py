@@ -103,7 +103,7 @@ class TestApi(TestWithDb):
                 'type': 'value_error',
                 'loc': ['body', 'amount'],
                 'msg': 'amount must be greater than 0',
-            }]
+            }],
         }
 
         assert response.status_code == 422, response.text
@@ -172,7 +172,7 @@ class TestApi(TestWithDb):
                 'type': 'value_error',
                 'loc': ['body', 'amount'],
                 'msg': 'amount must be greater than 0',
-            }]
+            }],
         }
 
         assert response.status_code == 422, response.text
@@ -225,20 +225,20 @@ class TestApi(TestWithDb):
 
         assert response.json()['wallet']['balance'] == '2.9997'
 
-        async def test_transfer_equal_wallets(self, client: TestClient):
-            response: Response = await client.post(
-                path='/transfers',
-                json={'wallet_from': 1, 'wallet_to': 1, 'amount': '1'},
-            )
+    async def test_transfer_equal_wallets(self, client: TestClient):
+        response: Response = await client.post(
+            path='/transfers',
+            json={'wallet_from': 1, 'wallet_to': 1, 'amount': '1'},
+        )
 
-            assert response.status_code == 422, response.text
-            assert response.json() == {
-                'error': 'VALIDATION_ERROR',
-                'detail': [
-                    {
-                        'loc': EqMock(),
-                        'msg': 'Wallets are equal',
-                        'type': EqMock(),
-                    },
-                ],
-            }
+        assert response.status_code == 422, response.text
+        assert response.json() == {
+            'error': 'VALIDATION_ERROR',
+            'detail': [
+                {
+                    'loc': EqMock(),
+                    'msg': 'Wallets are equal',
+                    'type': EqMock(),
+                },
+            ],
+        }
