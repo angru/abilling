@@ -57,6 +57,9 @@ class Billing(Executor):
             ),
         )
 
+        if currency_id is None:
+            raise ValueError(f'Unknown currency:{currency}')
+
         try:
             result = await self.connection.fetchrow(
                 sa.insert(

@@ -13,6 +13,11 @@ pytestmark = pytest.mark.asyncio
 
 
 class TestBilling(TestWithDb):
+    async def test_create_wallet_with_wrong_currency(self, db: Db):
+        async with db.connection() as connection:
+            with pytest.raises(ValueError):
+                await Billing(connection).create_wallet(1, 'RUB')
+
     async def test_make_transaction_wallet_not_found(self, db: Db):
         async with db.connection() as connection:
             with pytest.raises(errors.NotFound):
