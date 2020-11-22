@@ -12,7 +12,7 @@ make test
 make run
 ```
 
-documentation available on local machine(http://localhost:5000/docs)
+documentation available on [local machine](http://localhost:5000/docs)
 
 
 ## ToDo
