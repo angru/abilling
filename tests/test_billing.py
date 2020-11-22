@@ -2,39 +2,28 @@ from decimal import Decimal
 
 import pytest
 
-from abilling.api import controllers
 from abilling.app.db import Db
+from abilling.billing import Billing
+from abilling.utils import errors
+from abilling.utils.constants import OperationType
 from tests.conftest import TestWithDb
-from tests.utils import EqMock
+
 
 pytestmark = pytest.mark.asyncio
 
 
 class TestBilling(TestWithDb):
-    async def test_create_client(self, db: Db):
-        client = await controllers.create_client(name='Bill', db=db)
+    async def test_operations_history_wallet_not_found(self, db: Db):
+        async with db.connection() as connection:
+            with pytest.raises(errors.NotFound):
+                await Billing(connection).save_history(999999, Decimal('1'), OperationType.ACCRUAL)
 
-        client_id = EqMock(store_value=True, type=int)
+    async def test_withdraw_wallet_not_found(self, db: Db):
+        async with db.connection() as connection:
+            with pytest.raises(errors.NotFound):
+                await Billing(connection).withdraw(999999, Decimal('1'))
 
-        assert client == {
-            'id': client_id,
-            'date': EqMock(),
-            'name': 'Bill',
-            'wallet': {
-                'id': EqMock(),
-                'client_id': client_id,
-                'balance': Decimal(0),
-            },
-        }
-
-    async def test_charge(self, db: Db):
-        client = await controllers.create_client(name='Bill', db=db)
-
-        await controllers.charge_wallet(client['id'], Decimal(10), db)
-
-    async def test_transfer(self, db: Db):
-        client1 = await controllers.create_client(name='Bill', db=db)
-        client2 = await controllers.create_client(name='John', db=db)
-
-        await controllers.charge_wallet(client1['id'], Decimal(10), db)
-        await controllers.make_transfer(client1['id'], client2['id'], Decimal(10), db)
+    async def test_create_wallet_client_not_found(self, db: Db):
+        async with db.connection() as connection:
+            with pytest.raises(errors.NotFound):
+                await Billing(connection).create_wallet(client_id=99999)

@@ -1,7 +1,7 @@
 import typing as t
-from decimal import Decimal
 
 import sqlalchemy as sa
+import asyncpg.exceptions
 
 from abilling import models
 from abilling.utils import errors
@@ -15,6 +15,7 @@ class Billing(Executor):
             sa.select([
                 models.client.c.id,
                 models.client.c.name,
+                models.client.c.date,
                 models.wallet.c.id,
                 models.wallet.c.balance,
             ]).select_from(
@@ -30,9 +31,10 @@ class Billing(Executor):
         return {
             'id': result[0],
             'name': result[1],
+            'date': result[2],
             'wallet': {
-                'id': result[2],
-                'balance': result[3],
+                'id': result[3],
+                'balance': result[4],
             }
         }
 
@@ -48,36 +50,41 @@ class Billing(Executor):
         }
 
     async def create_wallet(self, client_id) -> dict:
-        result = await self.connection.fetchrow(
-            sa.insert(models.wallet, return_defaults=True).values(client_id=client_id),
-        )
+        try:
+            result = await self.connection.fetchrow(
+                sa.insert(models.wallet, return_defaults=True).values(client_id=client_id),
+            )
+        except asyncpg.exceptions.ForeignKeyViolationError:
+            raise errors.NotFound(f'Client with id: {client_id} not found')
 
         return {
             'id': result['id'],
-            'client_id': client_id,
             'balance': result['balance'],
         }
 
     async def charge_wallet(self, wallet_id, amount) -> t.NoReturn:
-        await self.connection.fetchval(
+        result = await self.connection.fetchval(
             sa.update(models.wallet).where(
                 models.wallet.c.id == wallet_id
-            ).values(balance=models.wallet.c.balance + amount)
+            ).values(
+                balance=models.wallet.c.balance + amount,
+            ).returning(models.wallet.c.id)
         )
 
-    async def get_balance(self, wallet_id) -> Decimal:
-        return await self.connection.fetchval(
-            sa.select([models.wallet.c.balance]).where(models.wallet.c.id == wallet_id)
-        )
+        if not result:
+            raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
 
     async def save_history(self, wallet_id: int, amount, operation_type: OperationType) -> t.NoReturn:
-        await self.connection.fetchval(
-            sa.insert(models.operation_history).values(
-                wallet_id=wallet_id,
-                amount=amount,
-                type=operation_type,
+        try:
+            await self.connection.fetchval(
+                sa.insert(models.operation_history).values(
+                    wallet_id=wallet_id,
+                    amount=amount,
+                    type=operation_type,
+                )
             )
-        )
+        except asyncpg.exceptions.ForeignKeyViolationError:
+            raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
 
     async def withdraw(self, wallet_id, amount):
         balance = await self.connection.fetchval(
@@ -86,7 +93,14 @@ class Billing(Executor):
             )
         )
 
+        if balance is None:
+            raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
+
         if balance < amount:
             raise errors.NotEnoughMoney(message='Not enough money to perform transfer')
 
-        await self.charge_wallet(wallet_id, -amount)  # FIXME: use own query
+        await self.connection.fetchval(
+            sa.update(models.wallet).where(
+                models.wallet.c.id == wallet_id
+            ).values(balance=models.wallet.c.balance - amount)
+        )

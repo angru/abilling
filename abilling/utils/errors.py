@@ -1,8 +1,10 @@
 import typing as t
 
+from abilling.utils.constants import ErrorType
+
 
 class BaseError(Exception):
-    error: str = 'INTERNAL_ERROR'
+    error: str = ErrorType.INTERNAL_ERROR
     message: str = None
     detail: t.Any = None
 
@@ -25,8 +27,8 @@ class BaseError(Exception):
 
 
 class NotFound(BaseError):
-    error: str = 'OBJECT_NOT_FOUND'
+    error: str = ErrorType.OBJECT_NOT_FOUND
 
 
 class NotEnoughMoney(BaseError):
-    error: str = 'NOT_ENOUGH_MONEY'
+    error: str = ErrorType.NOT_ENOUGH_MONEY

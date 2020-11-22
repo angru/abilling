@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from fastapi import APIRouter, Depends
 from starlette import status
 from starlette.responses import Response
@@ -44,12 +42,7 @@ async def charge(operation_info: ChargeInfo, db_manager: Db = Depends(db)):
     status_code=204,
 )
 async def transfer(operation_info: TransferInfo, db_manager: Db = Depends(db)):
-    await controllers.make_transfer(
-        wallet_from=operation_info.wallet_from,
-        wallet_to=operation_info.wallet_to,
-        amount=Decimal(operation_info.amount),
-        db=db_manager,
-    )
+    await controllers.make_transfer(**operation_info.dict(), db=db_manager)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

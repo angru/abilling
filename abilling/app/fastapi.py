@@ -1,13 +1,12 @@
-import dataclasses
-
 from fastapi import FastAPI
-from starlette.responses import Response, JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.responses import JSONResponse
 
 from abilling.api import views
 from abilling.app.config import config
 from abilling.app.db import Db
 from abilling.utils import errors
-
+from abilling.utils.constants import ErrorType
 
 STATUS_CODE_BY_ERROR = {
     errors.NotFound: 404,
@@ -31,12 +30,22 @@ def create_app() -> FastAPI:
         await db.stop()
 
     @app.exception_handler(errors.BaseError)
-    async def http_exception_handler(request, exc: errors.NotFound):
+    async def handle_app_error(request, exc: errors.NotFound):
         return JSONResponse(exc.dict(), status_code=STATUS_CODE_BY_ERROR[type(exc)])
 
     @app.exception_handler(404)
-    async def http_exception_handler(request, exc):
-        return JSONResponse({'error': 'NOT_FOUND'}, status_code=404)
+    async def handle_404_error(request, exc):
+        return JSONResponse({'error': ErrorType.NOT_FOUND}, status_code=404)
+
+    @app.exception_handler(RequestValidationError)
+    async def handle_validation_error(request, exc: RequestValidationError):
+        return JSONResponse(
+            {
+                'error': ErrorType.VALIDATION_ERROR,
+                'detail': exc.errors(),
+            },
+            status_code=422
+        )
 
     app.include_router(views.billing_router)
 

@@ -11,7 +11,7 @@ ExecutorType = t.TypeVar('ExecutorType')
 class Db:
     pool: Pool = None
 
-    def __init__(self, url, min_size=3, max_size=10):
+    def __init__(self, url, min_size=1, max_size=1):
         self.url = url
         self.min_size = min_size
         self.max_size = max_size
@@ -30,6 +30,9 @@ class Db:
 
     def executor(self, executor: t.Type[ExecutorType], transaction=False) -> ExecutorType:
         return execute(self.pool, executor, transaction)
+
+    def connection(self):
+        return self.pool.acquire()
 
 
 @contextlib.asynccontextmanager
