@@ -50,7 +50,7 @@ class Billing(Executor):
             'date': result['date'],
         }
 
-    async def create_wallet(self, client_id, currency: str = Currency.USD) -> dict:
+    async def create_wallet(self, client_id: int, currency: str = Currency.USD) -> dict:
         currency_id = await self.connection.fetchval(
             sa.select([models.currency.c.id]).where(
                 models.currency.c.code == currency,
@@ -71,7 +71,7 @@ class Billing(Executor):
             'balance': result['balance'],
         }
 
-    async def change_balance(self, wallet_id, amount) -> t.NoReturn:
+    async def change_balance(self, wallet_id: int, amount: Decimal) -> t.NoReturn:
         try:
             result = await self.connection.fetchval(
                 sa.update(models.wallet).where(
@@ -89,6 +89,14 @@ class Billing(Executor):
     async def save_transaction(
         self, wallet_id: int, amount: Decimal, operation_type: OperationType, description=None,
     ) -> t.NoReturn:
+        """
+
+        :param wallet_id:
+        :param amount:
+        :param operation_type:
+        :param description: Addition info about transaction
+        :return:
+        """
         try:
             await self.connection.fetchval(
                 sa.insert(models.transaction).values(

@@ -25,11 +25,13 @@ async def make_transfer(wallet_from, wallet_to, amount: Decimal, db: Db):
         await billing.save_transaction(
             wallet_id=wallet_from, amount=-amount,
             operation_type=OperationType.WRITE_OFF,
+            description={'to': wallet_to},
         )
         await billing.change_balance(wallet_id=wallet_to, amount=amount)
         await billing.save_transaction(
             wallet_id=wallet_to, amount=amount,
             operation_type=OperationType.ACCRUAL,
+            description={'from': wallet_from},
         )
 
 

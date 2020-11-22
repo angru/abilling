@@ -36,7 +36,13 @@ class Db:
 
 
 @contextlib.asynccontextmanager
-async def execute(pool, executor: t.Type[ExecutorType], transaction=False) -> ExecutorType:
+async def execute(pool, executor: t.Type[ExecutorType], transaction: bool = False) -> ExecutorType:
+    """
+    :param pool: pool to acqure connection
+    :param executor: who will execute queries
+    :param transaction: execute in transaction mode
+    :return:
+    """
     conn = pool.transaction() if transaction else pool.acquire()
 
     async with conn as connection:
@@ -44,6 +50,12 @@ async def execute(pool, executor: t.Type[ExecutorType], transaction=False) -> Ex
 
 
 class Executor:
+    """Не то чтобы я хотел это в прод тащить, просто хотелось поэкперементировать,
+    как можно работать с одной транзакцией без:
+        * передачи в каждый метод для работы с БД обьекта транзакции/соединения
+        * синглтонов клиента БД на инициализируемых на уровне модуля
+        * декораторов
+    """
     connection = None
 
     def __init__(self, connection):
