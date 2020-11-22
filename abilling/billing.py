@@ -17,7 +17,7 @@ class Billing(Executor):
                 models.client.c.id,
                 models.client.c.name,
                 models.client.c.date,
-                models.wallet.c.id,
+                models.wallet.c.id.label('wallet_id'),
                 models.wallet.c.balance,
             ]).select_from(
                 models.client.join(models.wallet),
@@ -30,12 +30,12 @@ class Billing(Executor):
             raise errors.NotFound(message=f'Client with id: {client_id} not found')
 
         return {
-            'id': result[0],
-            'name': result[1],
-            'date': result[2],
+            'id': result['id'],
+            'name': result['name'],
+            'date': result['date'],
             'wallet': {
-                'id': result[3],
-                'balance': result[4],
+                'id': result['wallet_id'],
+                'balance': result['balance'],
             },
         }
 
@@ -71,14 +71,17 @@ class Billing(Executor):
             'balance': result['balance'],
         }
 
-    async def charge_wallet(self, wallet_id, amount) -> t.NoReturn:
-        result = await self.connection.fetchval(
-            sa.update(models.wallet).where(
-                models.wallet.c.id == wallet_id,
-            ).values(
-                balance=models.wallet.c.balance + amount,
-            ).returning(models.wallet.c.id),
-        )
+    async def change_balance(self, wallet_id, amount) -> t.NoReturn:
+        try:
+            result = await self.connection.fetchval(
+                sa.update(models.wallet).where(
+                    models.wallet.c.id == wallet_id,
+                ).values(
+                    balance=models.wallet.c.balance + amount,
+                ).returning(models.wallet.c.id),
+            )
+        except asyncpg.exceptions.CheckViolationError:
+            raise errors.NotEnoughMoney(message='Not enough money to change balance')
 
         if not result:
             raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
@@ -97,22 +100,3 @@ class Billing(Executor):
             )
         except asyncpg.exceptions.ForeignKeyViolationError:
             raise errors.NotFound(f'Wallet with id: {wallet_id} not found')
-
-    async def withdraw(self, wallet_id, amount):
-        balance = await self.connection.fetchval(
-            sa.select([models.wallet.c.balance]).with_for_update().where(
-                models.wallet.c.id == wallet_id,
-            ),
-        )
-
-        if balance is None:
-            raise errors.NotFound(message=f'Wallet with id: {wallet_id} not found')
-
-        if balance < amount:
-            raise errors.NotEnoughMoney(message='Not enough money to perform transfer')
-
-        await self.connection.fetchval(
-            sa.update(models.wallet).where(
-                models.wallet.c.id == wallet_id,
-            ).values(balance=models.wallet.c.balance - amount),
-        )

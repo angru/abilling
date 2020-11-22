@@ -15,18 +15,18 @@ async def create_client(name: str, db: Db) -> dict:
 
 async def charge_wallet(wallet_id: int, amount: Decimal, db: Db):
     async with db.executor(Billing, transaction=True) as billing:
-        await billing.charge_wallet(wallet_id, amount)
+        await billing.change_balance(wallet_id, amount)
         await billing.save_transaction(wallet_id, amount, OperationType.ACCRUAL)
 
 
 async def make_transfer(wallet_from, wallet_to, amount: Decimal, db: Db):
     async with db.executor(Billing, transaction=True) as billing:
-        await billing.withdraw(wallet_id=wallet_from, amount=amount)
+        await billing.change_balance(wallet_id=wallet_from, amount=-amount)
         await billing.save_transaction(
-            wallet_id=wallet_from, amount=amount,
+            wallet_id=wallet_from, amount=-amount,
             operation_type=OperationType.WRITE_OFF,
         )
-        await billing.charge_wallet(wallet_id=wallet_to, amount=amount)
+        await billing.change_balance(wallet_id=wallet_to, amount=amount)
         await billing.save_transaction(
             wallet_id=wallet_to, amount=amount,
             operation_type=OperationType.ACCRUAL,
