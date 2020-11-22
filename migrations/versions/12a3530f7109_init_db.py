@@ -40,7 +40,7 @@ def upgrade():
     sa.Column('currency_id', sa.BigInteger(), nullable=False),
     sa.Column('balance', sa.DECIMAL(), server_default=sa.text('0'), nullable=False),
     sa.ForeignKeyConstraint(['client_id'], [f'{config.DB_PG_SCHEMA}.client.id'], name='fk_wallet_client_id'),
-    sa.ForeignKeyConstraint(['currency_id'], ['abilling.currency.id'], name='fk_wallet_currency_id'),
+    sa.ForeignKeyConstraint(['currency_id'], [f'{config.DB_PG_SCHEMA}.currency.id'], name='fk_wallet_currency_id'),
     sa.PrimaryKeyConstraint('id'),
     sa.CheckConstraint('balance >= 0', name='check_balance_cant_be_negative'),
     schema=config.DB_PG_SCHEMA,
