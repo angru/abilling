@@ -11,6 +11,9 @@ from abilling.utils.constants import OperationType, Currency
 
 
 class Billing(Executor):
+    """Похоже на божественный обьект, но для простоты вынес в одну абстракцию,
+    которая инкапсулирует взаимодействие с БД
+    """
     async def get_client(self, client_id: int) -> dict:
         result = await self.connection.fetchrow(
             sa.select([

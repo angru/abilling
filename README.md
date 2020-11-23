@@ -35,8 +35,8 @@ documentation available on [local machine](http://localhost:5000/docs)
 
 ## Cons
 
-* Without `IdempotencyKey` transactions can duplicate because of network problems
-* Too simple data model
+* Without `IdempotencyKey` transactions can duplicate because of network issues
+* Data model is over-simplified
 * Operation type implemented as enum in table transaction. Better solution is separate table
 
 
@@ -44,3 +44,49 @@ documentation available on [local machine](http://localhost:5000/docs)
 
 * Scalability(horizontal) - mean application, database it's different story
 * Asynchronous - pretty fast for that type of task
+
+
+## API
+
+Create client
+```shell script
+curl --location --request POST 'localhost:5000/clients' \
+--header 'Content-Type: application/json' \
+--data-raw '{"name": "Oleg"}'
+```
+
+response:
+```json
+{
+    "name": "Oleg",
+    "id": 34,
+    "wallet": {
+        "id": 34,
+        "balance": "0"
+    }
+}
+```
+
+Get client info
+```shell script
+curl --location --request GET 'localhost:5000/clients/1'
+```
+
+Add funds to walled
+```shell script
+curl --location --request POST 'localhost:5000/charges' \
+--header 'Content-Type: application/json' \
+--data-raw '{"wallet_id": 1, "amount": "10.5"}'
+```
+
+Transfer funds
+
+```shell script
+curl --location --request POST 'localhost:5000/transfers' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "wallet_from": 1,
+    "wallet_to": 2,
+    "amount": "10.01"
+}'
+```
