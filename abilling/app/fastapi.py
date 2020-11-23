@@ -17,7 +17,7 @@ STATUS_CODE_BY_ERROR = {
 
 def apply_error_handlers(app: FastAPI):
     @app.exception_handler(errors.BaseError)
-    async def handle_app_error(request, exc: errors.NotFound):
+    async def handle_app_error(request, exc: errors.BaseError):
         return JSONResponse(exc.dict(), status_code=STATUS_CODE_BY_ERROR[type(exc)])
 
     @app.exception_handler(404)
