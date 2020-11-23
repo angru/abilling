@@ -25,3 +25,21 @@ documentation available on [local machine](http://localhost:5000/docs)
 * More detailed data about client
 * Operation type in separate table not enum
 * Add description to validators fields
+
+
+## Rationale
+
+* PostgreSQL - because I think C and A more important than P in that case
+* FastAPI - because IO bound task
+
+## Cons
+
+* Without `IdempotencyKey` transactions can duplicate because of network problems
+* Too simple data model
+* Operation type implemented as enum in table transaction. Better solution is separate table
+
+
+## Pros
+
+* Scalability(horizontal) - mean application, database it's different story
+* Asynchronous - pretty fast for that type of task
