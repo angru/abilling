@@ -25,6 +25,7 @@ documentation available on [local machine](http://localhost:5000/docs)
 * More detailed data about client
 * Operation type in separate table not enum
 * Add description to validators fields
+* More tests. Coverage means nothing
 
 
 ## Rationale
