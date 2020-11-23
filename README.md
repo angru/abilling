@@ -55,24 +55,12 @@ curl --location --request POST 'localhost:5000/clients' \
 --data-raw '{"name": "Oleg"}'
 ```
 
-response:
-```json
-{
-    "name": "Oleg",
-    "id": 34,
-    "wallet": {
-        "id": 34,
-        "balance": "0"
-    }
-}
-```
-
 Get client info
 ```shell script
 curl --location --request GET 'localhost:5000/clients/1'
 ```
 
-Add funds to walled
+Add funds to wallet
 ```shell script
 curl --location --request POST 'localhost:5000/charges' \
 --header 'Content-Type: application/json' \

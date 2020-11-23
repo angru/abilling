@@ -23,7 +23,7 @@ class Billing(Executor):
                 models.wallet.c.id.label('wallet_id'),
                 models.wallet.c.balance,
             ]).select_from(
-                models.client.join(models.wallet),
+                models.client.outerjoin(models.wallet),
             ).where(
                 models.client.c.id == client_id,
             ),
@@ -32,15 +32,19 @@ class Billing(Executor):
         if not result:
             raise errors.NotFound(message=f'Client with id: {client_id} not found')
 
-        return {
+        client = {
             'id': result['id'],
             'name': result['name'],
             'date': result['date'],
-            'wallet': {
+        }
+
+        if result['wallet_id']:
+            client['wallet'] = {
                 'id': result['wallet_id'],
                 'balance': result['balance'],
-            },
-        }
+            }
+
+        return client
 
     async def create_client(self, name) -> dict:
         result = await self.connection.fetchrow(

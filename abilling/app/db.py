@@ -4,7 +4,6 @@ import typing as t
 import asyncpgsa
 from asyncpg.pool import Pool
 
-
 ExecutorType = t.TypeVar('ExecutorType')
 
 
@@ -33,6 +32,9 @@ class Db:
 
     def connection(self):
         return self.pool.acquire()
+
+    def transaction(self):
+        return self.pool.transaction()
 
 
 @contextlib.asynccontextmanager
