@@ -21,7 +21,7 @@ documentation available on [local machine](http://localhost:5000/docs)
 ## ToDo
 
 * Add `IdempotencyKey` if necessary. Like [tome](https://docs.tome.ru/idempotency), [Яндекс.Касса](https://yookassa.ru/developers/using-api/basics#idempotence) did
-* Full body responses rather then 204 status codes
+* Full body responses rather than 204 status codes
 * More detailed data about client
 * Operation type in separate table not enum
 * Add description to validators fields
