@@ -44,10 +44,10 @@ class TestApi(TestWithDb):
 
         assert response.status_code == 201, response.text
         assert response.json() == {
-            'id': EqMock(),
+            'id': EqMock(int),
             'name': 'Bob',
             'wallet': {
-                'id': EqMock(),
+                'id': EqMock(int),
                 'balance': '0',
             },
         }
@@ -63,10 +63,10 @@ class TestApi(TestWithDb):
 
         assert response.status_code == 200, response.text
         assert response.json() == {
-            'id': EqMock(),
+            'id': EqMock(int),
             'name': 'Tom',
             'wallet': {
-                'id': EqMock(),
+                'id': EqMock(int),
                 'balance': '0',
             },
         }
@@ -141,7 +141,7 @@ class TestApi(TestWithDb):
 
         assert response.status_code == 400, response.text
         assert response.json() == {
-            'error': 'NOT_ENOUGH_MONEY', 'message': EqMock(), 'detail': None,
+            'error': 'NOT_ENOUGH_MONEY', 'message': EqMock(str), 'detail': None,
         }
 
         response: Response = await client.get(f'/clients/{client1_id}')
@@ -238,7 +238,7 @@ class TestApi(TestWithDb):
                 {
                     'loc': EqMock(),
                     'msg': 'Wallets are equal',
-                    'type': EqMock(),
+                    'type': EqMock(str),
                 },
             ],
         }

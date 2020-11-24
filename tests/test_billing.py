@@ -40,9 +40,9 @@ class TestBilling(TestWithDb):
             client = await Billing(t).create_client('Bill')
 
         assert client == {
-            'id': EqMock(type=int),
+            'id': EqMock(int),
             'name': 'Bill',
-            'date': EqMock(type=datetime),
+            'date': EqMock(datetime),
         }
 
     async def test_get_client(self, client, db: Db):
@@ -63,7 +63,7 @@ class TestBilling(TestWithDb):
             wallet = await executor.create_wallet(client['id'])
 
         assert wallet == {
-            'id': EqMock(type=int),
+            'id': EqMock(int),
             'balance': Decimal('0'),
         }
 
@@ -99,8 +99,8 @@ class TestBilling(TestWithDb):
 
         assert transactions == [
             {
-                'id': EqMock(type=int),
-                'date': EqMock(type=datetime),
+                'id': EqMock(int),
+                'date': EqMock(datetime),
                 'type': OperationType.ACCRUAL,
                 'wallet_id': wallet_id,
                 'amount': Decimal('1'),

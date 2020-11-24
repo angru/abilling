@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 import pytest
@@ -27,11 +28,11 @@ class TestControllers(TestWithDb):
         client = await controllers.create_client(name='Bill', db=db)
 
         assert client == {
-            'id': EqMock(),
-            'date': EqMock(),
+            'id': EqMock(int),
+            'date': EqMock(datetime),
             'name': 'Bill',
             'wallet': {
-                'id': EqMock(),
+                'id': EqMock(int),
                 'balance': Decimal(0),
             },
         }
